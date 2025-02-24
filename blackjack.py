@@ -14,7 +14,7 @@ ASPECT_RATIO = BASE_WIDTH/BASE_HEIGHT
 screen = pygame.display.set_mode([BASE_WIDTH, BASE_HEIGHT], pygame.RESIZABLE)
 pygame.display.set_caption('Blackjack 21')
 
-# Track window scaling
+# allow window scaling
 scale_factor_x = 1
 scale_factor_y = 1 
 
@@ -22,9 +22,76 @@ scale_factor_y = 1
 base_surface = pygame.Surface([BASE_WIDTH, BASE_HEIGHT])
 
 # game variables
-cards = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-one_deck = 4 * cards
+cards = ['2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '10C', 'JC', 'QC', 'KC', 'AC', 
+         '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', '10D', 'JD', 'QD', 'KD', 'AD',
+         '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '10H', 'JH', 'QH', 'KH', 'AH',
+         '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS']
 decks = 1 # prevent cardcounting
+
+# load card images
+card_images = {
+    '2C': pygame.image.load("img/2C.png"),
+    '3C': pygame.image.load("img/3C.png"),
+    '4C': pygame.image.load("img/4C.png"),
+    '5C': pygame.image.load("img/5C.png"),
+    '6C': pygame.image.load("img/6C.png"),
+    '7C': pygame.image.load("img/7C.png"),
+    '8C': pygame.image.load("img/8C.png"),
+    '9C': pygame.image.load("img/9C.png"),
+    '10C': pygame.image.load("img/10C.png"),
+    'JC': pygame.image.load("img/JC.png"),
+    'QC': pygame.image.load("img/QC.png"),
+    'KC': pygame.image.load("img/KC.png"),
+    'AC': pygame.image.load("img/AC.png"),
+
+    '2D': pygame.image.load("img/2D.png"),
+    '3D': pygame.image.load("img/3D.png"),
+    '4D': pygame.image.load("img/4D.png"),
+    '5D': pygame.image.load("img/5D.png"),
+    '6D': pygame.image.load("img/6D.png"),
+    '7D': pygame.image.load("img/7D.png"),
+    '8D': pygame.image.load("img/8D.png"),
+    '9D': pygame.image.load("img/9D.png"),
+    '10D': pygame.image.load("img/10D.png"),
+    'JD': pygame.image.load("img/JD.png"),
+    'QD': pygame.image.load("img/QD.png"),
+    'KD': pygame.image.load("img/KD.png"),
+    'AD': pygame.image.load("img/AD.png"),
+
+    '2H': pygame.image.load("img/2H.png"),
+    '3H': pygame.image.load("img/3H.png"),
+    '4H': pygame.image.load("img/4H.png"),
+    '5H': pygame.image.load("img/5H.png"),
+    '6H': pygame.image.load("img/6H.png"),
+    '7H': pygame.image.load("img/7H.png"),
+    '8H': pygame.image.load("img/8H.png"),
+    '9H': pygame.image.load("img/9H.png"),
+    '10H': pygame.image.load("img/10H.png"),
+    'JH': pygame.image.load("img/JH.png"),
+    'QH': pygame.image.load("img/QH.png"),
+    'KH': pygame.image.load("img/KH.png"),
+    'AH': pygame.image.load("img/AH.png"),
+
+    '2S': pygame.image.load("img/2S.png"),
+    '3S': pygame.image.load("img/3S.png"),
+    '4S': pygame.image.load("img/4S.png"),
+    '5S': pygame.image.load("img/5S.png"),
+    '6S': pygame.image.load("img/6S.png"),
+    '7S': pygame.image.load("img/7S.png"),
+    '8S': pygame.image.load("img/8S.png"),
+    '9S': pygame.image.load("img/9S.png"),
+    '10S': pygame.image.load("img/10S.png"),
+    'JS': pygame.image.load("img/JS.png"),
+    'QS': pygame.image.load("img/QS.png"),
+    'KS': pygame.image.load("img/KS.png"),
+    'AS': pygame.image.load("img/AS.png")
+}
+
+for key in card_images:
+    card_images[key] = pygame.transform.scale(card_images[key], (100, 140))
+
+
+
 
 fps = 60
 timer = pygame.time.Clock()
@@ -37,14 +104,14 @@ player_score = 0
 dealer_score = 0
 
 initial_deal = False # if yes, 2 cards should be drawn
-game_deck = copy.deepcopy(decks * one_deck) # make sure only copy gets modified and not original cards list
+game_deck = copy.deepcopy(decks * cards) # make sure only copy gets modified and not original cards list
 my_hand = []
 dealer_hand = []
 outcome = 0
 reveal_dealer = False
 hand_active = False
 add_score = False
-results = ['', 'Player busted! :(', 'Player wins :)', 'Dealer wins!', 'Tie game!']
+results = ['', 'Player busted! :(', 'Player wins :)', 'Dealer wins!', 'It\'s a draw!']
 
 # sound effects
 lose_sound = pygame.mixer.Sound("loss.wav")
@@ -68,45 +135,50 @@ def draw_scores(player, dealer):
 # draw cards visually on screen
 def draw_cards(player, dealer, reveal):
     for i in range (len(player)):
-        pygame.draw.rect(base_surface, 'white', [47 + (47 * i), 307 + (3 * i), 80, 147], 0, 3)
-        base_surface.blit(font.render(player[i], True, 'black'),(75 + 47 * i, 310 + 3 * i )) 
-        base_surface.blit(font.render(player[i], True, 'black'),(75 + 47 * i, 423 + 3 * i )) 
-        pygame.draw.rect(base_surface, 'red', [47 + (47 * i), 307 + (3 * i), 80, 147], 3, 3)
+        # pygame.draw.rect(base_surface, 'white', [47 + (47 * i), 307 + (3 * i), 80, 147], 0, 3)
+        base_surface.blit(card_images[player[i]], (47 + (47 * i), 307 + (3 * i), 100, 140))
+        # base_surface.blit(font.render(player[i], True, 'black'),(50 + 47 * i, 310 + 3 * i )) 
+        # base_surface.blit(font.render(player[i], True, 'black'),(50 + 47 * i, 423 + 3 * i )) 
+        pygame.draw.rect(base_surface, 'red', [47 + (47 * i), 307 + (3 * i), 100, 140], 3, 3)
         
     # if player hasn't finished turn, dealer hides one card
     for i in range (len(dealer)):
-        pygame.draw.rect(base_surface, 'white', [47 + (47 * i), 107 + (3 * i), 80, 147], 0, 3)
+        
+        
         if i != 0 or reveal:
-            base_surface.blit(font.render(dealer[i], True, 'black'),(50 + 47 * i, 110 + 3 * i )) 
-            base_surface.blit(font.render(dealer[i], True, 'black'),(50 + 47 * i, 223 + 3 * i ))
+            base_surface.blit(card_images[dealer[i]], (47 + (47 * i), 107 + (3 * i), 100, 140))
+            # base_surface.blit(font.render(dealer[i], True, 'black'),(50 + 47 * i, 110 + 3 * i )) 
+            # base_surface.blit(font.render(dealer[i], True, 'black'),(50 + 47 * i, 223 + 3 * i ))
         else:
-            base_surface.blit(font.render('???', True, 'black') ,(50 + 47 * i, 110 + 3 * i )) 
-            base_surface.blit(font.render('???', True, 'black') ,(50 + 47 * i, 223 + 3 * i ))
+            pygame.draw.rect(base_surface, 'white', [47 + (47 * i), 107 + (3 * i), 100, 140], 0, 3)
+            base_surface.blit(font.render('?', True, 'black') ,(50 + 47 * i, 110 + 3 * i )) 
+            base_surface.blit(font.render('?', True, 'black') ,(50 + 47 * i, 210 + 3 * i ))
+            
              
-        pygame.draw.rect(base_surface, 'blue', [47 + (47 * i), 107 + (3 * i), 80, 147], 3, 3)
+        pygame.draw.rect(base_surface, 'blue', [47 + (47 * i), 107 + (3 * i), 100, 140], 3, 3)
 
 # pass in hand and get best possible score
 def calculate_score(hand):
     #calculate new score evnery time and check how many aces
     hand_score = 0
-    aces_count = hand.count('A')
-    # for loop check wwat highest possible score is
-    for i in range (len(hand)):
-        # for 2-9 just add number (int) to total
-        for j in range(8):
-            if hand[i] == cards[j]:
-                hand_score += int(hand[i])
+    aces_count = 0
+    
+    for card in hand:
+        card_value = card[:-1] # slices last char and removes the suit 
+        # for values 2-10
+        if card_value.isdigit():
+            hand_score += int(card_value)
         # for 10 and face cards add 10
-        if hand[i] in ['10', 'J', 'Q', 'K']:
+        elif card_value in ['J', 'Q', 'K']:
             hand_score += 10
         # for aces start by adding 11, check to reduce afterwards
-        elif hand[i] == 'A':
+        elif card_value == 'A':
             hand_score += 11
+            aces_count += 1
         # determine how many aces need to be 1 instead of 11 to be under 21
-    if hand_score > 21 and aces_count > 0:
-        for i in range(aces_count):
-            if hand_score > 21:
-                hand_score -= 10
+    while hand_score > 21 and aces_count > 0:
+        hand_score -= 10
+        aces_count -= 1
     return hand_score
 
 #declare game conditions and buttons
@@ -119,6 +191,8 @@ def draw_game(act, records, result):
         deal_text = font.render('DEAL HAND', True, 'black')
         base_surface.blit(deal_text, (110, 33))
         button_list.append(deal)
+        esc_text = smaller_font.render('Press Esc to quit', True, 'white')
+        base_surface.blit(esc_text, (20, 560))
     # once game started, put hit and stand buttons + win/loss records
     else:
         hit = pygame.draw.rect(base_surface, 'white', [0, 467, 200, 66], 0, 3)
@@ -208,10 +282,15 @@ while run:
         scaled_rect.height *= scale_factor_y  
         scaled_buttons.append(scaled_rect)  
 
-    # event handling, if quit pressed, exit game
+    # event handling
     for event in pygame.event.get():
+
+        # handle quiting
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                run = False
 
         # reset dimensions when resizing
         elif event.type == pygame.VIDEORESIZE:
@@ -227,15 +306,14 @@ while run:
 
             scale_factor_x = new_width / BASE_WIDTH  
             scale_factor_y = new_height / BASE_HEIGHT  
-        
-
+                       
         if event.type == pygame.MOUSEBUTTONUP:
             click_sound.play()
             if not active:
                 if scaled_buttons[0].collidepoint(event.pos): # Deal button
                     active = True
                     initial_deal = True # 2 cards drawn
-                    game_deck = copy.deepcopy(decks * one_deck) # make sure only copy gets modified and not original cards list
+                    game_deck = copy.deepcopy(decks * cards) # make sure only copy gets modified and not original cards list
                     my_hand = []
                     dealer_hand = []
                     outcome = 0
@@ -253,7 +331,7 @@ while run:
                     if scaled_buttons[2].collidepoint(event.pos):
                         active = True
                         initial_deal = True # 2 cards drawn
-                        game_deck = copy.deepcopy(decks * one_deck) # make sure only copy gets modified and not original cards list
+                        game_deck = copy.deepcopy(decks * cards) # make sure only copy gets modified and not original cards list
                         my_hand = []
                         dealer_hand = []
                         outcome = 0
