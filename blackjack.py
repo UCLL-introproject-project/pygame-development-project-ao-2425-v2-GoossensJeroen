@@ -90,13 +90,15 @@ card_images = {
 for key in card_images:
     card_images[key] = pygame.transform.scale(card_images[key], (100, 140))
 
-
-
+# load background
+background = pygame.image.load("img/background.jpg")
+background = pygame.transform.scale(background, (BASE_WIDTH, BASE_HEIGHT))
 
 fps = 60
 timer = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 30)
 smaller_font = pygame.font.Font('freesansbold.ttf', 25)
+smallest_font = pygame.font.Font('freesansbold.ttf', 14)
 active = False
 
 records = [0, 0, 0] # win, loss, tie
@@ -117,6 +119,7 @@ results = ['', 'Player busted! :(', 'Player wins :)', 'Dealer wins!', 'It\'s a d
 lose_sound = pygame.mixer.Sound("loss.wav")
 win_sound = pygame.mixer.Sound("win.wav")
 click_sound = pygame.mixer.Sound("click.wav")
+draw_sound = pygame.mixer.Sound("draw.wav")
 
 # define functions
 # deal cards randomly from deck, one at a time
@@ -139,7 +142,7 @@ def draw_cards(player, dealer, reveal):
         base_surface.blit(card_images[player[i]], (47 + (47 * i), 307 + (3 * i), 100, 140))
         # base_surface.blit(font.render(player[i], True, 'black'),(50 + 47 * i, 310 + 3 * i )) 
         # base_surface.blit(font.render(player[i], True, 'black'),(50 + 47 * i, 423 + 3 * i )) 
-        pygame.draw.rect(base_surface, 'red', [47 + (47 * i), 307 + (3 * i), 100, 140], 3, 3)
+        pygame.draw.rect(base_surface, 'black', [47 + (47 * i), 307 + (3 * i), 100, 140], 2, 3)
         
     # if player hasn't finished turn, dealer hides one card
     for i in range (len(dealer)):
@@ -155,7 +158,7 @@ def draw_cards(player, dealer, reveal):
             base_surface.blit(font.render('?', True, 'black') ,(50 + 47 * i, 210 + 3 * i ))
             
              
-        pygame.draw.rect(base_surface, 'blue', [47 + (47 * i), 107 + (3 * i), 100, 140], 3, 3)
+        pygame.draw.rect(base_surface, 'black', [47 + (47 * i), 107 + (3 * i), 100, 140], 2, 3)
 
 # pass in hand and get best possible score
 def calculate_score(hand):
@@ -186,23 +189,25 @@ def draw_game(act, records, result):
     button_list = []
     #initially on startup - only option is deal new hand
     if not act:
-        deal = pygame.draw.rect(base_surface, 'white', [100, 13, 200, 66], 0, 3)
-        pygame.draw.rect(base_surface, 'green', [100, 13, 200, 66], 2, 3)
+        deal = pygame.draw.rect(base_surface, 'white', [100, 13, 200, 66], 0, 5)
+        # pygame.draw.rect(base_surface, 'green', [100, 13, 200, 66], 2, 3)
         deal_text = font.render('DEAL HAND', True, 'black')
         base_surface.blit(deal_text, (110, 33))
         button_list.append(deal)
         esc_text = smaller_font.render('Press Esc to quit', True, 'white')
-        base_surface.blit(esc_text, (20, 560))
+        base_surface.blit(esc_text, (90, 475))
+        disclaimer = smallest_font.render('Image by Freepik.com', True, 'white')
+        base_surface.blit(disclaimer, (110, 580))
     # once game started, put hit and stand buttons + win/loss records
     else:
-        hit = pygame.draw.rect(base_surface, 'white', [0, 467, 200, 66], 0, 3)
-        pygame.draw.rect(base_surface, 'green', [0, 467, 200, 66], 2, 3)
+        hit = pygame.draw.rect(base_surface, 'white', [0, 467, 200, 66], 0, 5)
+        pygame.draw.rect(base_surface, 'black', [0, 467, 200, 66], 2, 3)
         hit_text = font.render('HIT ME', True, 'black')
         base_surface.blit(hit_text, (37, 490))
         button_list.append(hit)
 
-        stand = pygame.draw.rect(base_surface, 'white', [200, 467, 200, 66], 0, 3)
-        pygame.draw.rect(base_surface, 'green', [200, 467, 200, 66], 2, 3)
+        stand = pygame.draw.rect(base_surface, 'white', [200, 467, 200, 66], 0, 5)
+        pygame.draw.rect(base_surface, 'black', [200, 467, 200, 66], 2, 3)
         stand_text = font.render('STAND', True, 'black')
         base_surface.blit(stand_text, (237, 490))
         button_list.append(stand)
@@ -213,8 +218,8 @@ def draw_game(act, records, result):
     if result != 0:
         base_surface.blit(font.render(results[result], True, 'white'), (10, 17))
         deal = pygame.draw.rect(base_surface, 'white', [100, 147, 200, 66], 0, 3)
-        pygame.draw.rect(base_surface, 'green', [100, 147, 200, 66], 2, 3)
-        pygame.draw.rect(base_surface, 'black', [102, 149, 196, 63], 2, 3)
+        pygame.draw.rect(base_surface, 'black', [100, 147, 200, 66], 2, 3)
+        # pygame.draw.rect(base_surface, 'black', [102, 149, 196, 63], 2, 3)
         deal_text = font.render('NEW HAND', True, 'black')
         base_surface.blit(deal_text, (110, 170))
         button_list.append(deal)
@@ -241,6 +246,7 @@ def check_endgame(hand_act, deal_score, play_score, result, totals, add):
                 win_sound.play()
                 totals[0] += 1
             else:
+                draw_sound.play()
                 totals[2] += 1
             add = False
     return result, totals, add
@@ -250,8 +256,7 @@ run = True
 while run:
     # run game at framerate and fill screen with background color
     timer.tick(fps)
-    screen.fill('black')
-    base_surface.fill('black')
+    base_surface.blit(background, (0, 0))
 
     # initial deal to player and dealer
     if initial_deal:
@@ -270,9 +275,10 @@ while run:
                 dealer_hand, game_deck = deal_cards(dealer_hand, game_deck)
         draw_scores(player_score, dealer_score)
 
+    
     buttons = draw_game(active, records, outcome)
 
-    # Adjust button positions based on the scaling factor**
+    # Adjust button positions based on the scaling factor
     scaled_buttons = []  
     for button in buttons:
         scaled_rect = pygame.Rect(button)
@@ -304,8 +310,12 @@ while run:
             screen = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
             base_surface = pygame.Surface((BASE_WIDTH, BASE_HEIGHT))
 
+            # Scales to make UI responsive
             scale_factor_x = new_width / BASE_WIDTH  
             scale_factor_y = new_height / BASE_HEIGHT  
+
+            # Resize background dynamically
+            background = pygame.transform.scale(background, (BASE_WIDTH, BASE_HEIGHT))  
                        
         if event.type == pygame.MOUSEBUTTONUP:
             click_sound.play()
@@ -345,6 +355,7 @@ while run:
     scaled_surface = pygame.transform.smoothscale(base_surface, screen.get_size())
 
     # Blit to the screen
+    
     screen.blit(scaled_surface, (0, 0))
 
     # if player busts or blackjacks end turn automaticly
