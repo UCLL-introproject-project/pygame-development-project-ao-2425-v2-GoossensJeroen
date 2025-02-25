@@ -138,26 +138,18 @@ def draw_scores(player, dealer):
 # draw cards visually on screen
 def draw_cards(player, dealer, reveal):
     for i in range (len(player)):
-        # pygame.draw.rect(base_surface, 'white', [47 + (47 * i), 307 + (3 * i), 80, 147], 0, 3)
         base_surface.blit(card_images[player[i]], (47 + (47 * i), 307 + (3 * i), 100, 140))
-        # base_surface.blit(font.render(player[i], True, 'black'),(50 + 47 * i, 310 + 3 * i )) 
-        # base_surface.blit(font.render(player[i], True, 'black'),(50 + 47 * i, 423 + 3 * i )) 
         pygame.draw.rect(base_surface, 'black', [47 + (47 * i), 307 + (3 * i), 100, 140], 2, 3)
         
     # if player hasn't finished turn, dealer hides one card
-    for i in range (len(dealer)):
-        
-        
+    for i in range (len(dealer)):   
         if i != 0 or reveal:
             base_surface.blit(card_images[dealer[i]], (47 + (47 * i), 107 + (3 * i), 100, 140))
-            # base_surface.blit(font.render(dealer[i], True, 'black'),(50 + 47 * i, 110 + 3 * i )) 
-            # base_surface.blit(font.render(dealer[i], True, 'black'),(50 + 47 * i, 223 + 3 * i ))
         else:
             pygame.draw.rect(base_surface, 'white', [47 + (47 * i), 107 + (3 * i), 100, 140], 0, 3)
             base_surface.blit(font.render('?', True, 'black') ,(50 + 47 * i, 110 + 3 * i )) 
             base_surface.blit(font.render('?', True, 'black') ,(50 + 47 * i, 210 + 3 * i ))
             
-             
         pygame.draw.rect(base_surface, 'black', [47 + (47 * i), 107 + (3 * i), 100, 140], 2, 3)
 
 # pass in hand and get best possible score
@@ -190,7 +182,6 @@ def draw_game(act, records, result):
     #initially on startup - only option is deal new hand
     if not act:
         deal = pygame.draw.rect(base_surface, 'white', [100, 13, 200, 66], 0, 5)
-        # pygame.draw.rect(base_surface, 'green', [100, 13, 200, 66], 2, 3)
         deal_text = font.render('DEAL HAND', True, 'black')
         base_surface.blit(deal_text, (110, 33))
         button_list.append(deal)
@@ -219,7 +210,6 @@ def draw_game(act, records, result):
         base_surface.blit(font.render(results[result], True, 'white'), (10, 17))
         deal = pygame.draw.rect(base_surface, 'white', [100, 147, 200, 66], 0, 3)
         pygame.draw.rect(base_surface, 'black', [100, 147, 200, 66], 2, 3)
-        # pygame.draw.rect(base_surface, 'black', [102, 149, 196, 63], 2, 3)
         deal_text = font.render('NEW HAND', True, 'black')
         base_surface.blit(deal_text, (110, 170))
         button_list.append(deal)
@@ -251,6 +241,7 @@ def check_endgame(hand_act, deal_score, play_score, result, totals, add):
             add = False
     return result, totals, add
 
+
 # main game loop
 run = True
 while run:
@@ -275,7 +266,6 @@ while run:
                 dealer_hand, game_deck = deal_cards(dealer_hand, game_deck)
         draw_scores(player_score, dealer_score)
 
-    
     buttons = draw_game(active, records, outcome)
 
     # Adjust button positions based on the scaling factor
@@ -355,7 +345,6 @@ while run:
     scaled_surface = pygame.transform.smoothscale(base_surface, screen.get_size())
 
     # Blit to the screen
-    
     screen.blit(scaled_surface, (0, 0))
 
     # if player busts or blackjacks end turn automaticly
