@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
-
 import copy
 import random
 import pygame
 
 pygame.init()
 
-# setting up pygame-window
+# Setting up pygame-window
 BASE_WIDTH = 400
 BASE_HEIGHT = 600
 ASPECT_RATIO = BASE_WIDTH/BASE_HEIGHT
@@ -14,39 +12,38 @@ ASPECT_RATIO = BASE_WIDTH/BASE_HEIGHT
 screen = pygame.display.set_mode([BASE_WIDTH, BASE_HEIGHT], pygame.RESIZABLE)
 pygame.display.set_caption('Blackjack 21')
 
-# allow window scaling
+# Allow window scaling
 scale_factor_x = 1
 scale_factor_y = 1 
 
-#create surface to draw on (base resolution)
+# Create surface to draw on (base resolution)
 base_surface = pygame.Surface([BASE_WIDTH, BASE_HEIGHT])
-
 
 # Define values and suits
 values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 suits = ['C', 'D', 'H', 'S']
 
-# Generate the deck using nested loops
+# Generate the deck 
 cards = []
 for suit in suits:
     for value in values:
         cards.append(value + suit)
 
-# Number of decks
-decks = 3  # Prevent card counting
+number_of_decks = 3  # Prevent card counting
 
 # Load card images dynamically using a loop
 card_images = {}
 for card in cards:
     card_images[card] = pygame.image.load(f"img/{card}.png")
+
 for key in card_images:
     card_images[key] = pygame.transform.scale(card_images[key], (100, 140))
 
-# load background
+# Load background
 background = pygame.image.load("img/background.jpg")
 background = pygame.transform.scale(background, (BASE_WIDTH, BASE_HEIGHT))
 
-fps = 60
+FRAMES_PER_SECOND = 60
 timer = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 30)
 smaller_font = pygame.font.Font('freesansbold.ttf', 25)
@@ -57,9 +54,8 @@ records = [0, 0, 0] # win, loss, tie
 player_score = 0
 dealer_score = 0
 
-initial_deal = False # if yes, 2 cards should be drawn
-decks = 3 # prevent cardcounting
-game_deck = copy.deepcopy(decks * cards) # make sure only copy gets modified and not original cards list
+initial_deal = False # If yes, 2 cards should be drawn
+game_deck = number_of_decks * cards
 my_hand = []
 dealer_hand = []
 outcome = 0
@@ -68,27 +64,27 @@ hand_active = False
 add_score = False
 results = ['', 'Player busted! :(', 'Player wins :)', 'Dealer wins!', 'It\'s a draw!']
 
-# sound effects
+# Sound effects
 lose_sound = pygame.mixer.Sound("loss.wav")
 win_sound = pygame.mixer.Sound("win.wav")
 click_sound = pygame.mixer.Sound("click.wav")
 draw_sound = pygame.mixer.Sound("draw.wav")
 
-# define functions
-# deal cards randomly from deck, one at a time
+# Define functions
+# Deal cards randomly from deck, one at a time
 def deal_cards(current_hand, current_deck):
     card = random.randint(0, len(current_deck)-1)
     current_hand.append(current_deck[card])
     current_deck.pop(card)
     return current_hand, current_deck
 
-# draw scores on scaled_surface
+# Draw scores on scaled_surface
 def draw_scores(player, dealer):
     base_surface.blit(font.render(f'Score [{player}]', True, 'white'), (233, 266))
     if reveal_dealer:
         base_surface.blit(font.render(f'Score [{dealer}]', True, 'white'), (233, 66))
 
-# draw cards visually on screen
+# Draw cards visually on screen
 def draw_cards(player, dealer, reveal):
     for i in range (len(player)):
         base_surface.blit(card_images[player[i]], (47 + (47 * i), 307 + (3 * i), 100, 140))
@@ -105,7 +101,7 @@ def draw_cards(player, dealer, reveal):
             
         pygame.draw.rect(base_surface, 'black', [47 + (47 * i), 107 + (3 * i), 100, 140], 2, 3)
 
-# pass in hand and get best possible score
+# Pass in hand and get best possible score
 def calculate_score(hand):
     #calculate new score evnery time and check how many aces
     hand_score = 0
@@ -129,7 +125,7 @@ def calculate_score(hand):
         aces_count -= 1
     return hand_score
 
-#declare game conditions and buttons
+# Declare game conditions and buttons
 def draw_game(act, records, result):
     button_list = []
     #initially on startup - only option is deal new hand
@@ -168,7 +164,7 @@ def draw_game(act, records, result):
         button_list.append(deal)
     return button_list
 
-# check endgame conditions functions
+# Check endgame conditions functions
 def check_endgame(hand_act, deal_score, play_score, result, totals, add):
     # check endgame scenarios: stood, busted or blackjacked
     # result 1-bust 2-win 3-loss 4-tie
@@ -195,11 +191,11 @@ def check_endgame(hand_act, deal_score, play_score, result, totals, add):
     return result, totals, add
 
 
-# main game loop
+# Main game loop
 run = True
 while run:
     # run game at framerate and fill screen with background color
-    timer.tick(fps)
+    timer.tick(FRAMES_PER_SECOND)
     base_surface.blit(background, (0, 0))
 
     # initial deal to player and dealer
@@ -266,7 +262,7 @@ while run:
                 if scaled_buttons[0].collidepoint(event.pos): # Deal button
                     active = True
                     initial_deal = True # 2 cards drawn
-                    game_deck = copy.deepcopy(decks * cards) # make sure only copy gets modified and not original cards list
+                    game_deck = number_of_decks * cards
                     my_hand = []
                     dealer_hand = []
                     outcome = 0
@@ -284,7 +280,7 @@ while run:
                     if scaled_buttons[2].collidepoint(event.pos):
                         active = True
                         initial_deal = True # 2 cards drawn
-                        game_deck = copy.deepcopy(decks * cards) # make sure only copy gets modified and not original cards list
+                        game_deck = number_of_decks * cards
                         my_hand = []
                         dealer_hand = []
                         outcome = 0
