@@ -21,72 +21,24 @@ scale_factor_y = 1
 #create surface to draw on (base resolution)
 base_surface = pygame.Surface([BASE_WIDTH, BASE_HEIGHT])
 
-# game variables
-cards = ['2C', '3C', '4C', '5C', '6C', '7C', '8C', '9C', '10C', 'JC', 'QC', 'KC', 'AC', 
-         '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', '10D', 'JD', 'QD', 'KD', 'AD',
-         '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '10H', 'JH', 'QH', 'KH', 'AH',
-         '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS']
-decks = 1 # prevent cardcounting
 
-# load card images
-card_images = {
-    '2C': pygame.image.load("img/2C.png"),
-    '3C': pygame.image.load("img/3C.png"),
-    '4C': pygame.image.load("img/4C.png"),
-    '5C': pygame.image.load("img/5C.png"),
-    '6C': pygame.image.load("img/6C.png"),
-    '7C': pygame.image.load("img/7C.png"),
-    '8C': pygame.image.load("img/8C.png"),
-    '9C': pygame.image.load("img/9C.png"),
-    '10C': pygame.image.load("img/10C.png"),
-    'JC': pygame.image.load("img/JC.png"),
-    'QC': pygame.image.load("img/QC.png"),
-    'KC': pygame.image.load("img/KC.png"),
-    'AC': pygame.image.load("img/AC.png"),
+# Define values and suits
+values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+suits = ['C', 'D', 'H', 'S']
 
-    '2D': pygame.image.load("img/2D.png"),
-    '3D': pygame.image.load("img/3D.png"),
-    '4D': pygame.image.load("img/4D.png"),
-    '5D': pygame.image.load("img/5D.png"),
-    '6D': pygame.image.load("img/6D.png"),
-    '7D': pygame.image.load("img/7D.png"),
-    '8D': pygame.image.load("img/8D.png"),
-    '9D': pygame.image.load("img/9D.png"),
-    '10D': pygame.image.load("img/10D.png"),
-    'JD': pygame.image.load("img/JD.png"),
-    'QD': pygame.image.load("img/QD.png"),
-    'KD': pygame.image.load("img/KD.png"),
-    'AD': pygame.image.load("img/AD.png"),
+# Generate the deck using nested loops
+cards = []
+for suit in suits:
+    for value in values:
+        cards.append(value + suit)
 
-    '2H': pygame.image.load("img/2H.png"),
-    '3H': pygame.image.load("img/3H.png"),
-    '4H': pygame.image.load("img/4H.png"),
-    '5H': pygame.image.load("img/5H.png"),
-    '6H': pygame.image.load("img/6H.png"),
-    '7H': pygame.image.load("img/7H.png"),
-    '8H': pygame.image.load("img/8H.png"),
-    '9H': pygame.image.load("img/9H.png"),
-    '10H': pygame.image.load("img/10H.png"),
-    'JH': pygame.image.load("img/JH.png"),
-    'QH': pygame.image.load("img/QH.png"),
-    'KH': pygame.image.load("img/KH.png"),
-    'AH': pygame.image.load("img/AH.png"),
+# Number of decks
+decks = 3  # Prevent card counting
 
-    '2S': pygame.image.load("img/2S.png"),
-    '3S': pygame.image.load("img/3S.png"),
-    '4S': pygame.image.load("img/4S.png"),
-    '5S': pygame.image.load("img/5S.png"),
-    '6S': pygame.image.load("img/6S.png"),
-    '7S': pygame.image.load("img/7S.png"),
-    '8S': pygame.image.load("img/8S.png"),
-    '9S': pygame.image.load("img/9S.png"),
-    '10S': pygame.image.load("img/10S.png"),
-    'JS': pygame.image.load("img/JS.png"),
-    'QS': pygame.image.load("img/QS.png"),
-    'KS': pygame.image.load("img/KS.png"),
-    'AS': pygame.image.load("img/AS.png")
-}
-
+# Load card images dynamically using a loop
+card_images = {}
+for card in cards:
+    card_images[card] = pygame.image.load(f"img/{card}.png")
 for key in card_images:
     card_images[key] = pygame.transform.scale(card_images[key], (100, 140))
 
@@ -106,6 +58,7 @@ player_score = 0
 dealer_score = 0
 
 initial_deal = False # if yes, 2 cards should be drawn
+decks = 3 # prevent cardcounting
 game_deck = copy.deepcopy(decks * cards) # make sure only copy gets modified and not original cards list
 my_hand = []
 dealer_hand = []
